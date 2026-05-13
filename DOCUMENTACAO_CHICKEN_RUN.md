@@ -28,8 +28,8 @@ Bibliotecas usadas:
 - `freeglut`: cria janela, recebe eventos de teclado/mouse e controla callbacks.
 - `OpenGL`: desenha o jogo com primitivas graficas.
 - `GLU`: biblioteca auxiliar grafica usada no link.
-- `OpenAL`: gera e toca sons.
-- `math`: usada em circulos, elipses, particulas e ondas sonoras.
+- `OpenAL`: carrega e toca sons externos em formato WAV.
+- `math`: usada em circulos, elipses e particulas.
 
 ## 3. Organizacao dos modulos
 
@@ -240,23 +240,23 @@ Funcoes importantes:
 
 Controlam sons e musica de fundo.
 
-O audio nao depende de arquivos externos. Os sons sao gerados em memoria usando ondas senoidais.
+O audio agora usa arquivos externos em formato WAV. Isso deixa a explicacao mais simples: o codigo abre os arquivos da pasta `assets/audio`, carrega os dados no OpenAL e depois apenas toca cada som quando o jogo precisa.
 
 Sons implementados:
 
-- pulo;
-- colisao;
-- splash;
-- vitoria;
-- derrota;
-- pontuacao;
-- musica de fundo em loop.
+- `assets/audio/pulo.wav`;
+- `assets/audio/colisao.wav`;
+- `assets/audio/splash.wav`;
+- `assets/audio/vitoria.wav`;
+- `assets/audio/derrota.wav`;
+- `assets/audio/pontuacao.wav`;
+- `assets/audio/musica.wav`.
 
 Funcoes importantes:
 
 - `iniciarAudio`: abre dispositivo OpenAL, cria buffers e fontes.
-- `gerarTom`: cria som curto.
-- `gerarMusica`: cria loop simples de fundo.
+- `carregarWav`: le um arquivo WAV simples e coloca no buffer do OpenAL.
+- `configurarFonte`: liga um buffer a uma fonte de som.
 - `tocarSom`: toca um efeito sonoro.
 - `tocarMusicaFundo`: toca musica em loop.
 - `finalizarAudio`: libera recursos.
@@ -456,7 +456,7 @@ Alem disso, OpenAL foi usado como biblioteca extra para audio.
 
 ### 12. Audios e sons
 
-O modulo `audio.c` cria sons em memoria com OpenAL.
+O modulo `audio.c` usa OpenAL para carregar arquivos WAV externos da pasta `assets/audio`.
 
 Sons:
 
@@ -468,7 +468,7 @@ Sons:
 - pontuacao;
 - musica de fundo.
 
-Nao ha arquivos externos de audio. Isso facilita a execucao em sala, porque o jogo nao depende de `.wav` ou `.mp3`.
+Essa versao e mais facil de explicar porque os sons ficam separados do codigo. Para trocar um som, basta substituir o arquivo WAV correspondente mantendo o mesmo nome.
 
 ### 13. Deteccao de colisao
 
@@ -546,7 +546,7 @@ No modulo `efeitos.c`. Ele controla particulas, flash vermelho e trilha da galin
 
 ### 13. Como os sons sao carregados?
 
-Eles nao sao carregados de arquivos. O codigo gera ondas sonoras em memoria com OpenAL.
+Eles ficam em arquivos WAV na pasta `assets/audio`. O `audio.c` abre cada arquivo, le o formato WAV e entrega os dados para o OpenAL tocar.
 
 ### 14. Como o menu funciona?
 
@@ -723,25 +723,28 @@ static BotaoMenu botaoIniciar = {0.0f, 0.42f, 0.70f, 0.14f, "JOGAR AGORA", 0};
 
 ### 9. Mudar sons
 
-Arquivo: `audio.c`
+Pasta: `assets/audio`
 
-Trecho:
+Arquivos:
 
-```c
-gerarTom(buffers[SOM_PULO], 660.0f, 0.10f, 0.35f);
-```
+- `pulo.wav`;
+- `colisao.wav`;
+- `splash.wav`;
+- `vitoria.wav`;
+- `derrota.wav`;
+- `pontuacao.wav`;
+- `musica.wav`.
 
-Parametros:
+Como resolver:
 
-- frequencia: deixa o som mais grave ou agudo;
-- duracao: tempo do som;
-- volume: intensidade.
+- Grave ou exporte um novo arquivo WAV.
+- Coloque na pasta `assets/audio`.
+- Mantenha exatamente o mesmo nome do arquivo que voce quer substituir.
+- Recompile se tambem tiver alterado codigo; se apenas trocou o WAV, basta abrir o jogo novamente.
 
-Exemplo para pulo mais agudo:
+Exemplo: para mudar o som do pulo, substitua `assets/audio/pulo.wav` por outro arquivo chamado `pulo.wav`.
 
-```c
-gerarTom(buffers[SOM_PULO], 820.0f, 0.10f, 0.35f);
-```
+Se quiser mudar o volume de um som, altere o ultimo parametro da chamada `configurarFonte` em `audio.c`.
 
 ### 10. Mudar intensidade dos efeitos
 
@@ -894,7 +897,7 @@ Evite alterar:
 | Mudar menu | `menu.c` | botoes e funcoes de desenho |
 | Mudar HUD | `hud.c` | `desenharHUD` |
 | Mudar colisao | `colisao.c` | `criarRetanguloFrango`, `criarRetanguloObstaculo` |
-| Mudar sons | `audio.c` | chamadas de `gerarTom` |
+| Mudar sons | `assets/audio` | substituir arquivos `.wav` |
 | Mudar particulas | `efeitos.c` e `efeitos.h` | `MAX_PARTICULAS`, `criarExplosaoParticulas` |
 
 ## 11. Explicacao curta para apresentar
@@ -926,4 +929,3 @@ Este jogo foi feito em C com GLUT e OpenGL. O GLUT cria a janela e chama funcoes
 - Deixar o terminal aberto na pasta do projeto.
 - Saber onde estao as constantes principais.
 - Fazer alteracoes pequenas e recompilar depois de cada uma.
-
