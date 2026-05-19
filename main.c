@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "audio.h"
+#include "captura_tela.h"
 #include "cenario.h"
 #include "colisao.h"
 #include "efeitos.h"
@@ -80,7 +81,7 @@ static void finalizarComVitoria(void)
         bonus = 0;
     }
     somarPontuacao(bonus);
-    salvarMelhorPontuacao();
+    salvarPontuacaoClassificacao();
     jogo.estadoAtual = ESTADO_VITORIA;
     tocarSom(SOM_VITORIA);
 }
@@ -93,7 +94,7 @@ static void perderVida(TipoSom som)
     frangoJogador.vidas--;
 
     if (verificarDerrota(&frangoJogador)) {
-        salvarMelhorPontuacao();
+        salvarPontuacaoClassificacao();
         jogo.estadoAtual = ESTADO_DERROTA;
         tocarSom(SOM_DERROTA);
         return;
@@ -182,6 +183,7 @@ void renderizar(void)
 
     if (jogo.estadoAtual == ESTADO_MENU) {
         desenharMenuInicial();
+        desenharBotaoCaptura();
         glutSwapBuffers();
         return;
     }
@@ -205,6 +207,7 @@ void renderizar(void)
         desenharTelaDerrota(jogo.pontuacao);
     }
     desenharFlashTela();
+    desenharBotaoCaptura();
     glutSwapBuffers();
 }
 
@@ -235,6 +238,10 @@ void processarTeclado(unsigned char tecla, int x, int y)
     }
     if (normalizada == 'p') {
         alternarPausa();
+        return;
+    }
+    if (normalizada == 'q') {
+        salvarCapturaTelaDownloads();
         return;
     }
     if (normalizada == 'r') {
@@ -274,6 +281,12 @@ void processarMouse(int botao, int estado, int x, int y)
     EstadoJogo estadoAnterior;
 
     if (botao != GLUT_LEFT_BUTTON || estado != GLUT_DOWN) {
+        return;
+    }
+
+    if (clicouNoBotaoCaptura(x, y)) {
+        salvarCapturaTelaDownloads();
+        glutPostRedisplay();
         return;
     }
 

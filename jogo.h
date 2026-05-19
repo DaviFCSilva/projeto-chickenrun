@@ -26,5 +26,9 @@ void iniciarPartida(void);
 void atualizarTempoJogo(void);
 void somarPontuacao(int pontos);
 void salvarMelhorPontuacao(void);
+void carregarClassificacao(void);
+void salvarPontuacaoClassificacao(void);
+int obterTotalClassificacao(void);
+int obterPontuacaoClassificacao(int indice);
 
 #endif

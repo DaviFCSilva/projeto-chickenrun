@@ -1,6 +1,6 @@
 #include "obstaculo.h"
 #include "cenario.h"
-#include <GL/glut.h>
+#include "visual.h"
 #include <stdlib.h>
 #include <time.h>
 
@@ -12,6 +12,8 @@ int totalObstaculos = 0;
 #define VELOCIDADE_PISTA 0.34f
 #define VELOCIDADE_RIO 0.24f
 #define VARIACAO_VELOCIDADE 0.035f
+#define APARENCIA_CARRO VISUAL_CARRO
+#define APARENCIA_TORA VISUAL_TABUA
 
 static void adicionarObstaculo(Obstaculo novo)
 {
@@ -20,81 +22,6 @@ static void adicionarObstaculo(Obstaculo novo)
     }
     obstaculos[totalObstaculos] = novo;
     totalObstaculos++;
-}
-
-static void desenharCorpoRetangular(Obstaculo *o)
-{
-    float e = o->x - o->largura * 0.5f;
-    float d = o->x + o->largura * 0.5f;
-    float b = o->y - o->altura * 0.5f;
-    float c = o->y + o->altura * 0.5f;
-
-    glBegin(GL_QUADS);
-    glVertex2f(e, b);
-    glVertex2f(d, b);
-    glVertex2f(d, c);
-    glVertex2f(e, c);
-    glEnd();
-}
-
-static void desenharDetalheRetangular(float x, float y, float largura, float altura)
-{
-    glBegin(GL_QUADS);
-    glVertex2f(x - largura * 0.5f, y - altura * 0.5f);
-    glVertex2f(x + largura * 0.5f, y - altura * 0.5f);
-    glVertex2f(x + largura * 0.5f, y + altura * 0.5f);
-    glVertex2f(x - largura * 0.5f, y + altura * 0.5f);
-    glEnd();
-}
-
-static void desenharCarro(Obstaculo *o)
-{
-    glColor3f(o->corR, o->corG, o->corB);
-    desenharCorpoRetangular(o);
-
-    glColor3f(0.75f, 0.90f, 1.0f);
-    glBegin(GL_TRIANGLES);
-    glVertex2f(o->x - o->largura * 0.22f, o->y + o->altura * 0.50f);
-    glVertex2f(o->x + o->largura * 0.22f, o->y + o->altura * 0.50f);
-    glVertex2f(o->x, o->y + o->altura * 0.90f);
-    glEnd();
-
-    glColor3f(1.0f, 0.93f, 0.34f);
-    desenharDetalheRetangular(o->x + o->largura * 0.42f, o->y,
-                              o->largura * 0.10f, o->altura * 0.26f);
-    desenharDetalheRetangular(o->x - o->largura * 0.42f, o->y,
-                              o->largura * 0.10f, o->altura * 0.26f);
-
-    glColor3f(1.0f, 1.0f, 1.0f);
-    desenharDetalheRetangular(o->x, o->y - o->altura * 0.05f,
-                              o->largura * 0.55f, o->altura * 0.08f);
-
-    glColor3f(0.02f, 0.02f, 0.02f);
-    glPointSize(5.0f);
-    glBegin(GL_POINTS);
-    glVertex2f(o->x - o->largura * 0.32f, o->y - o->altura * 0.48f);
-    glVertex2f(o->x + o->largura * 0.32f, o->y - o->altura * 0.48f);
-    glEnd();
-}
-
-static void desenharTora(Obstaculo *o)
-{
-    glColor3f(o->corR, o->corG, o->corB);
-    desenharCorpoRetangular(o);
-
-    glColor3f(0.72f, 0.42f, 0.16f);
-    desenharDetalheRetangular(o->x, o->y + o->altura * 0.22f,
-                              o->largura * 0.84f, o->altura * 0.12f);
-
-    glColor3f(0.25f, 0.12f, 0.04f);
-    glBegin(GL_LINES);
-    glVertex2f(o->x - o->largura * 0.40f, o->y - o->altura * 0.30f);
-    glVertex2f(o->x - o->largura * 0.40f, o->y + o->altura * 0.30f);
-    glVertex2f(o->x, o->y - o->altura * 0.35f);
-    glVertex2f(o->x, o->y + o->altura * 0.35f);
-    glVertex2f(o->x + o->largura * 0.40f, o->y - o->altura * 0.30f);
-    glVertex2f(o->x + o->largura * 0.40f, o->y + o->altura * 0.30f);
-    glEnd();
 }
 
 void iniciarObstaculos(void)
@@ -179,9 +106,17 @@ void desenharObstaculos(void)
             continue;
         }
         if (obstaculos[i].tipo == TIPO_CARRO) {
-            desenharCarro(&obstaculos[i]);
+            desenharVisual(APARENCIA_CARRO,
+                           obstaculos[i].x, obstaculos[i].y,
+                           obstaculos[i].largura, obstaculos[i].altura,
+                           obstaculos[i].corR, obstaculos[i].corG,
+                           obstaculos[i].corB);
         } else if (obstaculos[i].tipo == TIPO_TORA) {
-            desenharTora(&obstaculos[i]);
+            desenharVisual(APARENCIA_TORA,
+                           obstaculos[i].x, obstaculos[i].y,
+                           obstaculos[i].largura, obstaculos[i].altura,
+                           obstaculos[i].corR, obstaculos[i].corG,
+                           obstaculos[i].corB);
         }
     }
 }

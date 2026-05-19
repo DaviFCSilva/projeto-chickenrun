@@ -29,6 +29,28 @@ static void desenharTextoGrandeCentralizado(float x, float y, const char *texto)
     desenharTextoGrande(x - ajuste, y, texto);
 }
 
+static void desenharClassificacaoFinal(void)
+{
+    int total = obterTotalClassificacao();
+    int i;
+    char texto[64];
+
+    glColor3f(1.0f, 0.94f, 0.20f);
+    desenharTexto(0.42f, 0.58f, "CLASSIFICACAO");
+
+    glColor3f(1.0f, 1.0f, 1.0f);
+    if (total == 0) {
+        desenharTexto(0.42f, 0.52f, "Sem pontos");
+        return;
+    }
+
+    for (i = 0; i < total; i++) {
+        snprintf(texto, sizeof(texto), "%d. %d pontos",
+                 i + 1, obterPontuacaoClassificacao(i));
+        desenharTexto(0.42f, 0.52f - (float)i * 0.055f, texto);
+    }
+}
+
 static void converterMouse(int mouseX, int mouseY, float *x, float *y)
 {
     float largura = (float)jogo.larguraJanela;
@@ -139,6 +161,7 @@ void desenharTelaVitoria(int pontuacao, int tempo)
     snprintf(texto, sizeof(texto), "Pontos: %d   Tempo: %ds", pontuacao, tempo / 1000);
     glColor3f(1.0f, 1.0f, 1.0f);
     desenharTexto(-0.32f, 0.57f, texto);
+    desenharClassificacaoFinal();
     desenharBotao(&botaoReiniciar);
     desenharBotao(&botaoMenuFinal);
 }
@@ -153,6 +176,7 @@ void desenharTelaDerrota(int pontuacao)
     snprintf(texto, sizeof(texto), "Pontos: %d", pontuacao);
     glColor3f(1.0f, 1.0f, 1.0f);
     desenharTexto(-0.13f, 0.57f, texto);
+    desenharClassificacaoFinal();
     desenharBotao(&botaoReiniciar);
     desenharBotao(&botaoMenuFinal);
 }
