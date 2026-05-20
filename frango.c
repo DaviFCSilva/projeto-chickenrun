@@ -6,6 +6,17 @@
 
 #define APARENCIA_FRANGO VISUAL_FRANGO
 
+static int obterFaixaInicialFrango(void)
+{
+    if (FAIXA_INICIAL_FRANGO < 0) {
+        return 0;
+    }
+    if (FAIXA_INICIAL_FRANGO > META_VITORIA) {
+        return META_VITORIA;
+    }
+    return FAIXA_INICIAL_FRANGO;
+}
+
 static void limitarFrangoNaTela(Frango *f)
 {
 #if JOGO_LATERAL
@@ -111,19 +122,16 @@ void moverFrangoDireita(Frango *f)
 
 void resetarFrango(Frango *f)
 {
+    int faixaInicial = obterFaixaInicialFrango();
+
 #if JOGO_LATERAL
-    f->x = obterXFaixa(0) + ALTURA_FAIXA * 0.5f;
+    f->faixaAtual = faixaInicial;
+    f->x = obterXFaixa(f->faixaAtual) + ALTURA_FAIXA * 0.5f;
     f->y = (Y_BAIXO_MUNDO + Y_CIMA_MUNDO) * 0.5f;
-    f->faixaAtual = 0;
 #else
     f->x = 0.0f;
-#if JOGO_INVERTIDO
-    f->faixaAtual = META_VITORIA;
+    f->faixaAtual = faixaInicial;
     f->y = obterYFaixa(f->faixaAtual) + ALTURA_FAIXA * 0.5f;
-#else
-    f->y = Y_INICIAL_FRANGO;
-    f->faixaAtual = 0;
-#endif
 #endif
     f->estaVivo = 1;
 }

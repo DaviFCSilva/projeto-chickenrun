@@ -5,7 +5,6 @@
 #define TAMANHO_FRANGO 0.05f
 #define PASSO_FRANGO 0.18f
 #define LIMITE_X_FRANGO 0.95f
-#define Y_INICIAL_FRANGO 0.09f
 
 typedef struct {
     float x, y;

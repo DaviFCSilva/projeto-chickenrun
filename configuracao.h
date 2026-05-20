@@ -3,6 +3,6 @@
 
 #define JOGO_INVERTIDO 0
 #define JOGO_LATERAL 0
+#define FAIXA_INICIAL_FRANGO 5
 
 #endif
-
