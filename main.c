@@ -46,10 +46,14 @@ static void configurarOpenGL(void)
 
 static void adicionarObstaculosExtrasAoLadoDoFrango(void)
 {
-    adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
-                                     TIPO_CARRO, LADO_CARRO_EXTRA);
-    adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
-                                     TIPO_TORA, LADO_TORA_EXTRA);
+    if (LADO_CARRO_EXTRA != 0) {
+        adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
+                                         TIPO_CARRO, LADO_CARRO_EXTRA);
+    }
+    if (LADO_TORA_EXTRA != 0) {
+        adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
+                                         TIPO_TORA, LADO_TORA_EXTRA);
+    }
 }
 
 static void prepararPartidaCompleta(void)
@@ -416,7 +420,6 @@ int main(int argc, char **argv)
     iniciarFrango(&frangoJogador);
     iniciarFrango(&frangoExtra);
     iniciarObstaculos();
-    adicionarObstaculosExtrasAoLadoDoFrango();
     limparEfeitos();
     iniciarAudio();
     tocarMusicaFundo();
