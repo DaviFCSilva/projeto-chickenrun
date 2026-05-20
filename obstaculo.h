@@ -1,7 +1,7 @@
 #ifndef OBSTACULO_H
 #define OBSTACULO_H
 
-#define MAX_OBSTACULOS 50
+#define MAX_OBSTACULOS 500
 #define META_VITORIA 10
 
 typedef enum {

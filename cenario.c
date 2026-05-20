@@ -1,4 +1,5 @@
 #include "cenario.h"
+#include "configuracao.h"
 #include "obstaculo.h"
 #include <GL/glut.h>
 
@@ -31,10 +32,41 @@ static void desenharChegada(float y)
     }
 }
 
+static void desenharChegadaLateral(float x)
+{
+    int i;
+    float alturaCasa = 0.10f;
+
+    desenharGrama(x, Y_BAIXO_MUNDO, ALTURA_FAIXA, ALTURA_MUNDO);
+    for (i = 0; i < 14; i++) {
+        float y = Y_BAIXO_MUNDO + (float)i * alturaCasa;
+
+        if (i % 2 == 0) {
+            glColor3f(0.96f, 0.96f, 0.92f);
+        } else {
+            glColor3f(0.08f, 0.08f, 0.08f);
+        }
+        desenharRetangulo(x + ALTURA_FAIXA * 0.64f, y,
+                          ALTURA_FAIXA * 0.24f, alturaCasa);
+    }
+}
+
 TipoFaixa obterTipoFaixa(int indiceFaixa)
 {
     if (indiceFaixa <= 0 || indiceFaixa >= META_VITORIA) {
         return FAIXA_GRAMA;
+    }
+    if (indiceFaixa == 1) {
+        return FAIXA_RIO;
+    }
+    if (indiceFaixa == 3) {
+        return FAIXA_RIO;
+    }
+     if (indiceFaixa == 4) {
+        return FAIXA_PISTA;
+    }
+     if (indiceFaixa <= 5) {
+        return FAIXA_PISTA;
     }
     if (indiceFaixa % 5 == 0) {
         return FAIXA_GRAMA;
@@ -50,6 +82,62 @@ float obterYFaixa(int indiceFaixa)
     return (float)indiceFaixa * ALTURA_FAIXA;
 }
 
+float obterXFaixa(int indiceFaixa)
+{
+    return (float)indiceFaixa * ALTURA_FAIXA;
+}
+
+static void desenharPistaLateral(float x, float y, float largura, float altura)
+{
+    float passo;
+
+    glColor3f(0.17f, 0.17f, 0.18f);
+    desenharRetangulo(x, y, largura, altura);
+
+    glColor3f(0.24f, 0.24f, 0.25f);
+    desenharRetangulo(x + largura * 0.08f, y, largura * 0.08f, altura);
+    desenharRetangulo(x + largura * 0.84f, y, largura * 0.08f, altura);
+
+    glColor3f(0.10f, 0.10f, 0.11f);
+    glBegin(GL_LINES);
+    glVertex2f(x, y);
+    glVertex2f(x, y + altura);
+    glVertex2f(x + largura, y);
+    glVertex2f(x + largura, y + altura);
+    glEnd();
+
+    glColor3f(0.95f, 0.82f, 0.18f);
+    glLineWidth(2.0f);
+    glBegin(GL_LINES);
+    for (passo = y + 0.04f; passo < y + altura; passo += 0.22f) {
+        glVertex2f(x + largura * 0.50f, passo);
+        glVertex2f(x + largura * 0.50f, passo + 0.11f);
+    }
+    glEnd();
+    glLineWidth(1.0f);
+}
+
+static void desenharRioLateral(float x, float y, float largura, float altura)
+{
+    float passo;
+
+    glColor3f(0.05f, 0.36f, 0.82f);
+    desenharRetangulo(x, y, largura, altura);
+
+    glColor3f(0.04f, 0.24f, 0.60f);
+    desenharRetangulo(x, y, largura * 0.18f, altura);
+
+    glColor3f(0.45f, 0.78f, 1.0f);
+    glBegin(GL_LINES);
+    for (passo = y + 0.02f; passo < y + altura; passo += 0.20f) {
+        glVertex2f(x + largura * 0.35f, passo);
+        glVertex2f(x + largura * 0.45f, passo + 0.08f);
+        glVertex2f(x + largura * 0.65f, passo + 0.10f);
+        glVertex2f(x + largura * 0.55f, passo + 0.18f);
+    }
+    glEnd();
+}
+
 void desenharCenario(float offsetCamera)
 {
     int i;
@@ -60,10 +148,25 @@ void desenharCenario(float offsetCamera)
     }
 
     for (i = primeiraFaixa; i <= META_VITORIA + 4; i++) {
-        float y = obterYFaixa(i);
+#if JOGO_LATERAL
+        float x = obterXFaixa(i);
         TipoFaixa tipo = obterTipoFaixa(i);
 
         if (i == META_VITORIA) {
+            desenharChegadaLateral(x);
+        } else if (tipo == FAIXA_GRAMA) {
+            desenharGrama(x, Y_BAIXO_MUNDO, ALTURA_FAIXA, ALTURA_MUNDO);
+        } else if (tipo == FAIXA_PISTA) {
+            desenharPistaLateral(x, Y_BAIXO_MUNDO, ALTURA_FAIXA, ALTURA_MUNDO);
+        } else {
+            desenharRioLateral(x, Y_BAIXO_MUNDO, ALTURA_FAIXA, ALTURA_MUNDO);
+        }
+#else
+        float y = obterYFaixa(i);
+        TipoFaixa tipo = obterTipoFaixa(i);
+
+        if ((!JOGO_INVERTIDO && i == META_VITORIA) ||
+            (JOGO_INVERTIDO && i == 0)) {
             desenharChegada(y);
         } else if (tipo == FAIXA_GRAMA) {
             desenharGrama(X_ESQUERDA_MUNDO, y, LARGURA_MUNDO, ALTURA_FAIXA);
@@ -72,6 +175,7 @@ void desenharCenario(float offsetCamera)
         } else {
             desenharRio(X_ESQUERDA_MUNDO, y, LARGURA_MUNDO, ALTURA_FAIXA);
         }
+#endif
     }
 }
 

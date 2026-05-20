@@ -1,4 +1,5 @@
 #include "colisao.h"
+#include "configuracao.h"
 
 static RetanguloColisao criarRetanguloFrango(Frango *f)
 {
@@ -63,7 +64,11 @@ int verificarColisaoFrango(Frango *f, Obstaculo lista[], int total)
 
 int verificarVitoria(Frango *f)
 {
+#if JOGO_INVERTIDO
+    return f->faixaAtual <= 0;
+#else
     return f->faixaAtual >= META_VITORIA;
+#endif
 }
 
 int verificarDerrota(Frango *f)

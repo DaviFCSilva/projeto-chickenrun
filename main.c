@@ -6,6 +6,7 @@
 #include "captura_tela.h"
 #include "cenario.h"
 #include "colisao.h"
+#include "configuracao.h"
 #include "efeitos.h"
 #include "frango.h"
 #include "hud.h"
@@ -14,6 +15,7 @@
 #include "obstaculo.h"
 
 Frango frangoJogador;
+Frango frangoExtra;
 
 #define PONTOS_POR_FAIXA 12
 #define BONUS_VITORIA_BASE 360
@@ -56,7 +58,11 @@ static void prepararPartidaCompleta(void)
 
 static void atualizarOffsetCamera(void)
 {
+#if JOGO_LATERAL
+    offsetCamera = frangoJogador.x - 0.20f;
+#else
     offsetCamera = frangoJogador.y - 0.42f;
+#endif
     if (offsetCamera < 0.0f) {
         offsetCamera = 0.0f;
     }
@@ -125,7 +131,11 @@ static int frangoEstaSobreTora(float deltaTempo)
         areaTora.altura = obstaculos[i].altura;
 
         if (verificarColisaoAABB(areaFrango, areaTora)) {
+#if JOGO_LATERAL
+            frangoJogador.y += obstaculos[i].velocidade * deltaTempo;
+#else
             frangoJogador.x += obstaculos[i].velocidade * deltaTempo;
+#endif
             return 1;
         }
     }
@@ -146,8 +156,14 @@ static void verificarEventosDeColisao(float deltaTempo)
     if (faixa == FAIXA_RIO) {
         if (!frangoEstaSobreTora(deltaTempo)) {
             perderVida(SOM_SPLASH);
+#if JOGO_LATERAL
+        } else if (frangoJogador.y < Y_BAIXO_MUNDO ||
+                   frangoJogador.y > Y_CIMA_MUNDO) {
+            perderVida(SOM_SPLASH);
+#else
         } else if (frangoJogador.x < -1.05f || frangoJogador.x > 1.05f) {
             perderVida(SOM_SPLASH);
+#endif
         }
     }
 }
@@ -190,7 +206,11 @@ void renderizar(void)
 
     atualizarOffsetCamera();
     glPushMatrix();
+#if JOGO_LATERAL
+    glTranslatef(-offsetCamera, 0.0f, 0.0f);
+#else
     glTranslatef(0.0f, -offsetCamera, 0.0f);
+#endif
     desenharCenario(offsetCamera);
     desenharTrilha();
     desenharObstaculos();
@@ -250,13 +270,29 @@ void processarTeclado(unsigned char tecla, int x, int y)
     }
 
     if (normalizada == 'w') {
-        executarMovimento(moverFrangoFrente);
-    } else if (normalizada == 's') {
-        executarMovimento(moverFrangoTras);
-    } else if (normalizada == 'a') {
-        executarMovimento(moverFrangoEsquerda);
-    } else if (normalizada == 'd') {
+#if JOGO_LATERAL
         executarMovimento(moverFrangoDireita);
+#else
+        executarMovimento(moverFrangoFrente);
+#endif
+    } else if (normalizada == 's') {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoEsquerda);
+#else
+        executarMovimento(moverFrangoTras);
+#endif
+    } else if (normalizada == 'a') {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoTras);
+#else
+        executarMovimento(moverFrangoEsquerda);
+#endif
+    } else if (normalizada == 'd') {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoFrente);
+#else
+        executarMovimento(moverFrangoDireita);
+#endif
     }
 }
 
@@ -266,13 +302,29 @@ void processarTeclaEspecial(int tecla, int x, int y)
     (void)y;
 
     if (tecla == GLUT_KEY_UP) {
-        executarMovimento(moverFrangoFrente);
-    } else if (tecla == GLUT_KEY_DOWN) {
-        executarMovimento(moverFrangoTras);
-    } else if (tecla == GLUT_KEY_LEFT) {
-        executarMovimento(moverFrangoEsquerda);
-    } else if (tecla == GLUT_KEY_RIGHT) {
+#if JOGO_LATERAL
         executarMovimento(moverFrangoDireita);
+#else
+        executarMovimento(moverFrangoFrente);
+#endif
+    } else if (tecla == GLUT_KEY_DOWN) {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoEsquerda);
+#else
+        executarMovimento(moverFrangoTras);
+#endif
+    } else if (tecla == GLUT_KEY_LEFT) {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoTras);
+#else
+        executarMovimento(moverFrangoEsquerda);
+#endif
+    } else if (tecla == GLUT_KEY_RIGHT) {
+#if JOGO_LATERAL
+        executarMovimento(moverFrangoFrente);
+#else
+        executarMovimento(moverFrangoDireita);
+#endif
     }
 }
 
@@ -353,10 +405,14 @@ int main(int argc, char **argv)
     configurarOpenGL();
     iniciarJogo(900, 700);
     iniciarFrango(&frangoJogador);
+    iniciarFrango(&frangoExtra);
     iniciarObstaculos();
     limparEfeitos();
     iniciarAudio();
     tocarMusicaFundo();
+
+    frangoExtra.x = 0.25f;
+
 
     glutDisplayFunc(renderizar);
     glutReshapeFunc(redimensionar);

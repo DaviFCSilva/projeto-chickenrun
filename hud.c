@@ -1,4 +1,5 @@
 #include "hud.h"
+#include "configuracao.h"
 #include "jogo.h"
 #include "frango.h"
 #include "obstaculo.h"
@@ -65,7 +66,12 @@ void desenharVidas(int vidas)
 
 static void desenharProgresso(void)
 {
+#if JOGO_INVERTIDO
+    float progresso = (float)(META_VITORIA - frangoJogador.faixaAtual) /
+                      (float)META_VITORIA;
+#else
     float progresso = (float)frangoJogador.faixaAtual / (float)META_VITORIA;
+#endif
 
     if (progresso < 0.0f) {
         progresso = 0.0f;

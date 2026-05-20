@@ -1,16 +1,28 @@
 #include "frango.h"
+#include "cenario.h"
+#include "configuracao.h"
+#include "obstaculo.h"
 #include "visual.h"
 
 #define APARENCIA_FRANGO VISUAL_FRANGO
 
 static void limitarFrangoNaTela(Frango *f)
 {
+#if JOGO_LATERAL
+    if (f->y < Y_BAIXO_MUNDO + TAMANHO_FRANGO) {
+        f->y = Y_BAIXO_MUNDO + TAMANHO_FRANGO;
+    }
+    if (f->y > Y_CIMA_MUNDO - TAMANHO_FRANGO) {
+        f->y = Y_CIMA_MUNDO - TAMANHO_FRANGO;
+    }
+#else
     if (f->x < -LIMITE_X_FRANGO) {
         f->x = -LIMITE_X_FRANGO;
     }
     if (f->x > LIMITE_X_FRANGO) {
         f->x = LIMITE_X_FRANGO;
     }
+#endif
 }
 
 void iniciarFrango(Frango *f)
@@ -34,8 +46,18 @@ void moverFrangoFrente(Frango *f)
     if (!f->estaVivo) {
         return;
     }
+#if JOGO_LATERAL
+    f->x += PASSO_FRANGO;
+    f->faixaAtual++;
+#elif JOGO_INVERTIDO
+    if (f->faixaAtual > 0) {
+        f->y -= PASSO_FRANGO;
+        f->faixaAtual--;
+    }
+#else
     f->y += PASSO_FRANGO;
     f->faixaAtual++;
+#endif
 }
 
 void moverFrangoTras(Frango *f)
@@ -43,10 +65,22 @@ void moverFrangoTras(Frango *f)
     if (!f->estaVivo) {
         return;
     }
+#if JOGO_LATERAL
+    if (f->faixaAtual > 0) {
+        f->x -= PASSO_FRANGO;
+        f->faixaAtual--;
+    }
+#elif JOGO_INVERTIDO
+    if (f->faixaAtual < META_VITORIA) {
+        f->y += PASSO_FRANGO;
+        f->faixaAtual++;
+    }
+#else
     if (f->faixaAtual > 0) {
         f->y -= PASSO_FRANGO;
         f->faixaAtual--;
     }
+#endif
 }
 
 void moverFrangoEsquerda(Frango *f)
@@ -54,7 +88,11 @@ void moverFrangoEsquerda(Frango *f)
     if (!f->estaVivo) {
         return;
     }
+#if JOGO_LATERAL
+    f->y -= PASSO_FRANGO;
+#else
     f->x -= PASSO_FRANGO;
+#endif
     limitarFrangoNaTela(f);
 }
 
@@ -63,14 +101,29 @@ void moverFrangoDireita(Frango *f)
     if (!f->estaVivo) {
         return;
     }
+#if JOGO_LATERAL
+    f->y += PASSO_FRANGO;
+#else
     f->x += PASSO_FRANGO;
+#endif
     limitarFrangoNaTela(f);
 }
 
 void resetarFrango(Frango *f)
 {
+#if JOGO_LATERAL
+    f->x = obterXFaixa(0) + ALTURA_FAIXA * 0.5f;
+    f->y = (Y_BAIXO_MUNDO + Y_CIMA_MUNDO) * 0.5f;
+    f->faixaAtual = 0;
+#else
     f->x = 0.0f;
+#if JOGO_INVERTIDO
+    f->faixaAtual = META_VITORIA;
+    f->y = obterYFaixa(f->faixaAtual) + ALTURA_FAIXA * 0.5f;
+#else
     f->y = Y_INICIAL_FRANGO;
     f->faixaAtual = 0;
+#endif
+#endif
     f->estaVivo = 1;
 }
