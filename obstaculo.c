@@ -15,6 +15,7 @@ int totalObstaculos = 0;
 #define VARIACAO_VELOCIDADE 0.035f
 #define APARENCIA_CARRO VISUAL_CARRO
 #define APARENCIA_TORA VISUAL_TABUA
+#define DISTANCIA_OBSTACULO_EXTRA 0.45f
 
 static void adicionarObstaculo(Obstaculo novo)
 {
@@ -23,6 +24,45 @@ static void adicionarObstaculo(Obstaculo novo)
     }
     obstaculos[totalObstaculos] = novo;
     totalObstaculos++;
+}
+
+void adicionarObstaculoAoLadoDoFrango(float xFrango, float yFrango,
+                                      TipoObstaculo tipo, int lado)
+{
+    Obstaculo o;
+    int direcao = (lado < 0) ? -1 : 1;
+
+    o.x = xFrango + (float)direcao * DISTANCIA_OBSTACULO_EXTRA;
+    o.y = yFrango;
+    o.velocidade = 0.0f;
+    o.tipo = tipo;
+    o.ativo = 1;
+
+    if (tipo == TIPO_TORA) {
+#if JOGO_LATERAL
+        o.largura = ALTURA_FAIXA * 0.50f;
+        o.altura = 0.34f;
+#else
+        o.largura = 0.34f;
+        o.altura = ALTURA_FAIXA * 0.48f;
+#endif
+        o.corR = 0.52f;
+        o.corG = 0.28f;
+        o.corB = 0.10f;
+    } else {
+#if JOGO_LATERAL
+        o.largura = ALTURA_FAIXA * 0.48f;
+        o.altura = 0.22f;
+#else
+        o.largura = 0.22f;
+        o.altura = ALTURA_FAIXA * 0.48f;
+#endif
+        o.corR = 0.85f;
+        o.corG = 0.12f;
+        o.corB = 0.18f;
+    }
+
+    adicionarObstaculo(o);
 }
 
 void iniciarObstaculos(void)

@@ -44,11 +44,20 @@ static void configurarOpenGL(void)
     glPointSize(3.0f);
 }
 
+static void adicionarObstaculosExtrasAoLadoDoFrango(void)
+{
+    adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
+                                     TIPO_CARRO, LADO_CARRO_EXTRA);
+    adicionarObstaculoAoLadoDoFrango(frangoJogador.x, frangoJogador.y,
+                                     TIPO_TORA, LADO_TORA_EXTRA);
+}
+
 static void prepararPartidaCompleta(void)
 {
     iniciarPartida();
     iniciarFrango(&frangoJogador);
     iniciarObstaculos();
+    adicionarObstaculosExtrasAoLadoDoFrango();
     limparEfeitos();
     faixaRecorde = 0;
     offsetCamera = 0.0f;
@@ -407,6 +416,7 @@ int main(int argc, char **argv)
     iniciarFrango(&frangoJogador);
     iniciarFrango(&frangoExtra);
     iniciarObstaculos();
+    adicionarObstaculosExtrasAoLadoDoFrango();
     limparEfeitos();
     iniciarAudio();
     tocarMusicaFundo();

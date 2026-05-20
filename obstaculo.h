@@ -25,5 +25,7 @@ void iniciarObstaculos(void);
 void atualizarObstaculos(float deltaTempo);
 void desenharObstaculos(void);
 void gerarFaixa(int indiceFaixa);
+void adicionarObstaculoAoLadoDoFrango(float xFrango, float yFrango,
+                                      TipoObstaculo tipo, int lado);
 
 #endif
